@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#00aaff" />
+  <title>오늘 나에게 필요한 한마디 - Frutiger Aero Edition</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --primary: #0072ff;
+      --primary-light: #00c6ff;
+      --accent-green: #2bf081;
+      --text-dark: #072a40;
+      --subtext: #1a567a;
+      --glass-bg: rgba(255, 255, 255, 0.45);
+      --glass-border: rgba(255, 255, 255, 0.85);
+      --shadow-aero: 0 15px 35px rgba(0, 80, 150, 0.35), inset 0 2px 4px rgba(255, 255, 255, 0.9);
+    }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      font-family: Pretendard, -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans KR", sans-serif;
+      color: var(--text-dark);
+    }
+
+    body {
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: 
+        radial-gradient(circle at 50% 20%, rgba(255, 255, 255, 0.6), transparent 60%),
+        linear-gradient(180deg, #0099ff 0%, #33ccff 45%, #66ffb3 85%, #22e078 100%);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      position: relative;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0; left: 0; right: 0; height: 50vh;
+      background: linear-gradient(180deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 3D 에어로 구체 */
+    .aero-sphere {
+      position: fixed;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 25%, #ffffff 0%, #80d8ff 35%, #0072ff 85%, #003399 100%);
+      box-shadow: inset -5px -5px 15px rgba(0, 0, 0, 0.3), 0 12px 25px rgba(0, 50, 120, 0.4);
+      pointer-events: none;
+      z-index: 0;
+      animation: float 10s ease-in-out infinite alternate;
+    }
+
+    .sphere-1 { width: 140px; height: 140px; top: 8%; left: 8%; }
+    .sphere-2 { width: 200px; height: 200px; bottom: 5%; right: 5%; animation-delay: -4s; }
+
+    /* 상승하는 물방울 컨테이너 */
+    .droplet-container {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .droplet {
+      position: absolute;
+      bottom: -60px;
+      background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.4) 40%, rgba(0, 180, 255, 0.3) 80%, rgba(255, 255, 255, 0.8) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      box-shadow: inset -2px -2px 6px rgba(0, 100, 200, 0.3), inset 2px 2px 5px rgba(255, 255, 255, 0.9), 0 6px 12px rgba(0, 40, 80, 0.15);
+      animation: rise 8s infinite cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .droplet::after {
+      content: "";
+      position: absolute;
+      top: 15%; left: 20%;
+      width: 25%; height: 20%;
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 50%;
+      transform: rotate(-30deg);
+    }
+
+    @keyframes rise {
+      0% {
+        transform: translateY(0) scale(0.8);
+        opacity: 0;
+      }
+      10% { opacity: 0.85; }
+      90% { opacity: 0.85; }
+      100% {
+        transform: translateY(-110vh) scale(1.1);
+        opacity: 0;
+      }
+    }
+
+    @keyframes float {
+      0% { transform: translateY(0px) rotate(0deg); }
+      100% { transform: translateY(-25px) rotate(10deg); }
+    }
+
+    /* 앱 메인 글래스 컨테이너 */
+    .app {
+      width: min(100%, 720px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.75), rgba(220, 245, 255, 0.5));
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 2px solid var(--glass-border);
+      border-radius: 36px;
+      box-shadow: var(--shadow-aero);
+      padding: clamp(28px, 5vw, 50px);
+      text-align: center;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+
+    .app::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 40%;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
+      border-radius: 34px 34px 0 0;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #ffffff 0%, #d4f0ff 100%);
+      border: 1px solid rgba(255, 255, 255, 0.9);
+      color: var(--subtext);
+      font-size: 0.9rem;
+      font-weight: 800;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 10px rgba(0, 100, 180, 0.15), inset 0 1px 2px #fff;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      color: #032539;
+      text-shadow: 0 2px 4px rgba(255, 255, 255, 0.8), 0 1px 2px rgba(0, 80, 160, 0.2);
+      word-break: keep-all;
+    }
+
+    .description {
+      margin: 16px auto 28px;
+      color: var(--subtext);
+      font-size: clamp(0.98rem, 2.4vw, 1.08rem);
+      line-height: 1.6;
+      max-width: 520px;
+      font-weight: 500;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+      word-break: keep-all;
+    }
+
+    .message-card {
+      min-height: 210px;
+      border-radius: 28px;
+      padding: 34px 28px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.95) 0%, rgba(230, 248, 255, 0.85) 100%);
+      border: 1.5px solid #ffffff;
+      box-shadow: 0 10px 25px rgba(0, 70, 140, 0.12), inset 0 2px 5px #ffffff, inset 0 -2px 6px rgba(0, 150, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 26px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-mark {
+      font-size: 5rem;
+      line-height: 1;
+      color: rgba(0, 150, 255, 0.18);
+      position: absolute;
+      top: 10px;
+      left: 20px;
+      font-family: Georgia, serif;
+      user-select: none;
+    }
+
+    #message {
+      margin: 0;
+      font-size: clamp(1.3rem, 3.8vw, 1.85rem);
+      line-height: 1.5;
+      font-weight: 800;
+      color: #052a42;
+      letter-spacing: -0.02em;
+      word-break: keep-all;
+      max-width: 560px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #category {
+      margin-top: 16px;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 0.9rem;
+      background: rgba(0, 166, 255, 0.12);
+      padding: 4px 12px;
+      border-radius: 12px;
+      border: 1px solid rgba(0, 166, 255, 0.2);
+    }
+
+    .animate-message {
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: translateY(15px) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* 광택 입체 버튼 */
+    button {
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      appearance: none;
+      min-width: 200px;
+      padding: 16px 32px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #55c8ff 0%, #0078ff 50%, #004ed0 100%);
+      color: white;
+      font: inherit;
+      font-weight: 800;
+      font-size: 1.1rem;
+      cursor: pointer;
+      text-shadow: 0 -1px 2px rgba(0, 30, 90, 0.6);
+      box-shadow: 0 8px 20px rgba(0, 80, 180, 0.35), inset 0 2px 3px rgba(255, 255, 255, 0.8), inset 0 -3px 5px rgba(0, 30, 100, 0.4);
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    button::before {
+      content: "";
+      position: absolute;
+      top: 2px; left: 10%; right: 10%; height: 45%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.7) 0%, rgba(255,255,255,0.1) 100%);
+      border-radius: 999px 999px 50% 50%;
+      pointer-events: none;
+    }
+
+    button:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow: 0 12px 25px rgba(0, 100, 220, 0.45), inset 0 2px 5px rgba(255, 255, 255, 0.9);
+      filter: brightness(1.08);
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 10px rgba(0, 80, 180, 0.3), inset 0 2px 5px rgba(0, 20, 60, 0.5);
+    }
+
+    .tip {
+      margin-top: 18px;
+      color: var(--subtext);
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+    }
+
+    .pop-droplet {
+      position: absolute;
+      background: radial-gradient(circle at 30% 30%, #ffffff, #70d6ff);
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0, 60, 120, 0.2);
+      animation: popDroplet 0.75s ease-out forwards;
+    }
+
+    @keyframes popDroplet {
+      0% {
+        opacity: 0.9;
+        transform: translate(0, 0) scale(0.5);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(var(--tw-x), var(--tw-y)) scale(1.4);
+      }
+    }
+
+    @media (max-width: 520px) {
+      body { padding: 14px; }
+      .app { border-radius: 28px; padding: 28px 18px; }
+      .message-card { min-height: 210px; padding: 32px 18px; }
+      button { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="aero-sphere sphere-1"></div>
+  <div class="aero-sphere sphere-2"></div>
+
+  <div class="droplet-container" id="dropletContainer"></div>
+
+  <main class="app">
+    <div class="eyebrow">🫧 오늘의 오아시스</div>
+
+    <h1>오늘 나에게 필요한 한마디</h1>
+
+    <p class="description">
+      마음에 맑은 청량함이 필요한 순간,<br />
+      버튼을 눌러 상쾌한 메시지를 받아보세요.
+    </p>
+
+    <section class="message-card" id="messageCard" aria-live="polite">
+      <div class="quote-mark">“</div>
+      <p id="message">
+        지금 나에게 필요한 말을 만나볼까요?
+      </p>
+      <div id="category">READY</div>
+    </section>
+
+    <button id="messageButton" type="button">
+      💧 한마디 받기
+    </button>
+
+    <div class="tip">
+      버튼을 누르면 새로운 물방울과 한마디가 찾아와요.
+    </div>
+  </main>
+
+  <script>
+    const messages = [
+      { text: "완벽하게 하려 하지 말고, 오늘 할 수 있는 만큼만 해도 충분해.", category: "공부" },
+      { text: "조금 느려도 괜찮아. 멈추지 않고 가는 것이 더 중요해.", category: "도전" },
+      { text: "모르는 문제가 있다는 건, 앞으로 알게 될 것이 있다는 뜻이야.", category: "공부" },
+      { text: "친구의 속도와 내 속도는 달라도 괜찮아.", category: "자신감" },
+      { text: "오늘의 작은 시도가 내일의 자신감을 만든다.", category: "도전" },
+      { text: "힘든 날에는 잘 버티고 있는 것만으로도 충분히 잘한 거야.", category: "휴식" },
+      { text: "잠깐 쉬는 것은 포기가 아니라 다시 힘을 모으는 시간이야.", category: "휴식" },
+      { text: "누군가와 비교하기보다 어제의 나보다 한 걸음만 나아가 보자.", category: "자신감" },
+      { text: "실수는 내가 부족하다는 증거가 아니라 배우고 있다는 증거야.", category: "공부" },
+      { text: "먼저 다가가는 작은 용기가 관계를 바꿀 수도 있어.", category: "친구 관계" },
+      { text: "모든 사람에게 좋은 사람이 되려고 애쓰지 않아도 괜찮아.", category: "친구 관계" },
+      { text: "오늘 잘 안 풀렸다고 해서 내 가능성까지 사라지는 건 아니야.", category: "자신감" },
+      { text: "시작하기 싫은 날에는 딱 5분만 해보자. 시작이 가장 어렵다.", category: "공부" },
+      { text: "지금의 고민도 언젠가는 지나온 한 장면이 될 거야.", category: "마음" },
+      { text: "내가 나를 믿어주는 순간, 도전은 조금 덜 무서워진다.", category: "자신감" },
+      { text: "잘해야 시작할 수 있는 게 아니라, 시작해야 잘하게 된다.", category: "도전" },
+      { text: "마음이 복잡할수록 오늘 해야 할 한 가지만 정해보자.", category: "집중" },
+      { text: "친구와의 오해는 추측보다 대화로 풀어보는 것이 가장 빠르다.", category: "친구 관계" },
+      { text: "결과가 기대와 달라도, 그 과정에서 배운 것은 사라지지 않아.", category: "도전" },
+      { text: "오늘의 나에게도 따뜻하게 말해줄 자격이 있어.", category: "마음" },
+      { text: "한 번에 멀리 가지 않아도 돼. 한 걸음이면 충분해.", category: "도전" },
+      { text: "집중이 안 되는 날도 있어. 그런 날의 나까지 포함해서 나야.", category: "휴식" },
+      { text: "좋은 하루는 대단한 일보다 작은 만족에서 시작될 수 있어.", category: "마음" },
+      { text: "내 의견을 말하는 건 이기적인 게 아니라 나를 존중하는 일이야.", category: "친구 관계" }
+    ];
+
+    const messageEl = document.getElementById("message");
+    const categoryEl = document.getElementById("category");
+    const button = document.getElementById("messageButton");
+    const card = document.getElementById("messageCard");
+    const dropletContainer = document.getElementById("dropletContainer");
+
+    let lastIndex = -1;
+
+    function createBackgroundDroplets() {
+      const dropletCount = 12;
+      for (let i = 0; i < dropletCount; i++) {
+        const droplet = document.createElement("div");
+        droplet.className = "droplet";
+        
+        const size = Math.random() * 35 + 15;
+        const left = Math.random() * 100;
+        const delay = Math.random() * 8;
+        const duration = Math.random() * 6 + 6;
+
+        droplet.style.width = `${size}px`;
+        droplet.style.height = `${size}px`;
+        droplet.style.left = `${left}%`;
+        droplet.style.animationDelay = `${delay}s`;
+        droplet.style.animationDuration = `${duration}s`;
+
+        dropletContainer.appendChild(droplet);
+      }
+    }
+
+    function createPopDroplets() {
+      for (let i = 0; i < 7; i++) {
+        const drop = document.createElement("div");
+        drop.className = "pop-droplet";
+
+        const size = Math.random() * 18 + 10;
+        drop.style.width = `${size}px`;
+        drop.style.height = `${size}px`;
+
+        drop.style.left = `${50 + (Math.random() * 40 - 20)}%`;
+        drop.style.top = `${50 + (Math.random() * 40 - 20)}%`;
+
+        const twX = (Math.random() - 0.5) * 160 + "px";
+        const twY = (Math.random() - 0.5) * 160 - 40 + "px";
+        drop.style.setProperty("--tw-x", twX);
+        drop.style.setProperty("--tw-y", twY);
+
+        card.appendChild(drop);
+
+        setTimeout(() => drop.remove(), 750);
+      }
+    }
+
+    function getRandomIndex() {
+      if (messages.length <= 1) return 0;
+      let newIndex;
+      do {
+        newIndex = Math.floor(Math.random() * messages.length);
+      } while (newIndex === lastIndex);
+      return newIndex;
+    }
+
+    function showRandomMessage() {
+      const index = getRandomIndex();
+      lastIndex = index;
+      const selected = messages[index];
+
+      messageEl.classList.remove("animate-message");
+      categoryEl.classList.remove("animate-message");
+
+      void messageEl.offsetWidth;
+
+      messageEl.textContent = selected.text;
+      categoryEl.textContent = selected.category;
+
+      messageEl.classList.add("animate-message");
+      categoryEl.classList.add("animate-message");
+
+      createPopDroplets();
+    }
+
+    createBackgroundDroplets();
+    button.addEventListener("click", showRandomMessage);
+  </script>
+</body>
+</html>
